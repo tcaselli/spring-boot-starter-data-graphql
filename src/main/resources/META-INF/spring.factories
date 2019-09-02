@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.daikit.graphql.spring.SpringDataGraphqlAutoConfiguration,com.daikit.graphql.spring.GQLController

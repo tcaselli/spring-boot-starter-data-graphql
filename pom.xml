@@ -10,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<name>com.daikit:spring-boot-starter-data-graphql</name>
-	<description>Spring boot starter for GRAPQHL endpoing based on java-data-graphql library.</description>
+	<description>Spring boot starter for GRAPQHL endpoint based on java-data-graphql library.</description>
 	<inceptionYear>2019</inceptionYear>
 	<url>https://github.com/tcaselli/spring-boot-starter-data-graphql</url>
 

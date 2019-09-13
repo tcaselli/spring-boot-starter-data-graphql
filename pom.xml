@@ -115,7 +115,7 @@
 		<javajdk.version>1.8</javajdk.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>2.1.7.RELEASE</spring-boot.version>
-		<java-data-graphql.version>1.7</java-data-graphql.version>
+		<java-data-graphql.version>1.8</java-data-graphql.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
 	</properties>
 

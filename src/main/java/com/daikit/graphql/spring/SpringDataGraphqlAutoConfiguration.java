@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.daikit.graphql.config.GQLSchemaConfig;
 import com.daikit.graphql.execution.GQLErrorProcessor;
 import com.daikit.graphql.execution.GQLExecutor;
 import com.daikit.graphql.spring.web.GQLRequestHandler;
@@ -26,6 +27,13 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 @Configuration
 @EnableConfigurationProperties(SpringDataGraphqlProperties.class)
 public class SpringDataGraphqlAutoConfiguration {
+
+	@Autowired
+	private SpringDataGraphqlProperties properties;
+
+	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+	// PUBLIC METHODS
+	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
 	/**
 	 * @return the {@link WebMvcConfigurer}
@@ -107,6 +115,19 @@ public class SpringDataGraphqlAutoConfiguration {
 	public GQLRequestHandler createGQLRequestHandler(@Autowired final ObjectMapper gqlObjectMapper,
 			@Autowired final GQLExecutor executor) {
 		return new GQLRequestHandler(gqlObjectMapper, executor);
+	}
+
+	/**
+	 * Create the {@link GQLSchemaConfig} if not already defined
+	 *
+	 * @return the created {@link GQLSchemaConfig}
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public GQLSchemaConfig createSchemaConfig() {
+		final GQLSchemaConfig schemaConfig = new GQLSchemaConfig();
+		properties.initializeConfig(schemaConfig);
+		return schemaConfig;
 	}
 
 }

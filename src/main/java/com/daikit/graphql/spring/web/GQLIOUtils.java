@@ -32,7 +32,7 @@ public class GQLIOUtils {
 	 *            the {@link InputStream}
 	 * @return the
 	 */
-	public static String readInputStream(InputStream inputStream) {
+	public static String readInputStream(final InputStream inputStream) {
 		final Scanner scanner = new Scanner(inputStream);
 		scanner.useDelimiter("\\A");
 		final String read = scanner.hasNext() ? scanner.next() : "";
@@ -67,7 +67,7 @@ public class GQLIOUtils {
 	 * @param content
 	 *            the content to be written
 	 */
-	public static void writeInResponse(HttpServletResponse response, String content) {
+	public static void writeInResponse(final HttpServletResponse response, final String content) {
 		final byte[] bytes = content.getBytes();
 		response.setContentType(MediaType.APPLICATION_JSON.toString());
 		response.setContentLength(bytes.length);

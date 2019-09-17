@@ -67,7 +67,7 @@ public class SpringDataGraphqlProperties {
 	 * @param schemaConfig
 	 *            the {@link GQLSchemaConfig}
 	 */
-	public void initializeConfig(GQLSchemaConfig schemaConfig) {
+	public void initializeConfig(final GQLSchemaConfig schemaConfig) {
 		if (queryTypeName != null) {
 			schemaConfig.setQueryTypeName(queryTypeName);
 		}

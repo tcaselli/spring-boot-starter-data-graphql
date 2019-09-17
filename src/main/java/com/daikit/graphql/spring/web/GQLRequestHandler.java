@@ -272,7 +272,7 @@ public class GQLRequestHandler {
 	 * @return the JSON string
 	 * @throws JsonProcessingException
 	 */
-	private String toJSONForLog(Object value) throws JsonProcessingException {
+	private String toJSONForLog(final Object value) throws JsonProcessingException {
 		return loggerMapper.writeValueAsString(value);
 	}
 

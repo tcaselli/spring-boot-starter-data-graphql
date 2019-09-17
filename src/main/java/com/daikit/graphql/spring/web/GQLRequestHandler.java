@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,8 +50,8 @@ public class GQLRequestHandler {
 	 */
 	public static String GQL_FILENAME_PREFIX = "TMP_";
 
-	private final ObjectMapper objectMapper;
-	private final GQLExecutor executor;
+	private final Supplier<ObjectMapper> objectMapper;
+	private final Supplier<GQLExecutor> executor;
 	private final ObjectMapper loggerMapper = new ObjectMapper();
 
 	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -66,6 +67,21 @@ public class GQLRequestHandler {
 	 *            the {@link GQLExecutor} for executing queries/mutations
 	 */
 	public GQLRequestHandler(final ObjectMapper objectMapper, final GQLExecutor executor) {
+		this.objectMapper = () -> objectMapper;
+		this.executor = () -> executor;
+	}
+
+	/**
+	 * Constructor
+	 *
+	 * @param objectMapper
+	 *            the {@link ObjectMapper} {@link Supplier} for writing
+	 *            responses
+	 * @param executor
+	 *            the {@link GQLExecutor} {@link Supplier} for executing
+	 *            queries/mutations
+	 */
+	public GQLRequestHandler(final Supplier<ObjectMapper> objectMapper, final Supplier<GQLExecutor> executor) {
 		this.objectMapper = objectMapper;
 		this.executor = executor;
 	}
@@ -81,8 +97,8 @@ public class GQLRequestHandler {
 	 *            the {@link HttpServletResponse}
 	 */
 	public void handleIntrospectionRequest(final HttpServletResponse response) {
-		GQLIOUtils.writeInResponse(response, objectMapper,
-				GQLIntrospection.getAllTypes(query -> executor.execute(query)));
+		GQLIOUtils.writeInResponse(response, objectMapper.get(),
+				GQLIntrospection.getAllTypes(query -> executor.get().execute(query)));
 	}
 
 	/**
@@ -93,11 +109,11 @@ public class GQLRequestHandler {
 	 *            the {@link HttpServletResponse}
 	 */
 	public void handleIntrospectionFragmentsRequest(final HttpServletResponse response) {
-		final GQLExecutionResult result = GQLIntrospection.getFragments(query -> executor.execute(query));
+		final GQLExecutionResult result = GQLIntrospection.getFragments(query -> executor.get().execute(query));
 		final Map<String, Object> resultSchema = map(map(result.getData()).get("__schema"));
 		resultSchema.put("types", list(resultSchema.get("types")).stream()
 				.filter(map -> map.get("possibleTypes") != null).collect(Collectors.toList()));
-		GQLIOUtils.writeInResponse(response, objectMapper, result);
+		GQLIOUtils.writeInResponse(response, objectMapper.get(), result);
 	}
 
 	/**
@@ -126,14 +142,14 @@ public class GQLRequestHandler {
 		GQLRequestInputData inputData;
 		final Map<String, Object> variables;
 		try {
-			inputData = objectMapper.readValue(requestBody, GQLRequestInputData.class);
+			inputData = objectMapper.get().readValue(requestBody, GQLRequestInputData.class);
 			// variables is either null or TextNode or ObjectNode
 			variables = readVariables(inputData, request, multipart);
 		} catch (final IOException e) {
 			throw new GQLException(
 					Message.format("An error happened while reading request body to JSON. [{}]", e.getMessage()), e);
 		}
-		result = executor.execute(sanitize(inputData.getQuery().asText()), inputData.getOperationName(), null,
+		result = executor.get().execute(sanitize(inputData.getQuery().asText()), inputData.getOperationName(), null,
 				variables);
 		if (result.getErrorDetails() != null) {
 			try {
@@ -142,7 +158,7 @@ public class GQLRequestHandler {
 				e.printStackTrace();
 			}
 		}
-		GQLIOUtils.writeInResponse(response, objectMapper, result);
+		GQLIOUtils.writeInResponse(response, objectMapper.get(), result);
 	}
 
 	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -173,10 +189,10 @@ public class GQLRequestHandler {
 			if (inputData.getVariables() instanceof TextNode) {
 				final String asText = inputData.getVariables().asText();
 				variables = StringUtils.isNotEmpty(asText)
-						? objectMapper.readValue(inputData.getVariables().asText(), Map.class)
+						? objectMapper.get().readValue(inputData.getVariables().asText(), Map.class)
 						: Collections.emptyMap();
 			} else {
-				variables = objectMapper.convertValue(inputData.getVariables(), Map.class);
+				variables = objectMapper.get().convertValue(inputData.getVariables(), Map.class);
 			}
 		}
 		if (variables == null) {

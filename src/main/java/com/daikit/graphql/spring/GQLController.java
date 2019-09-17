@@ -10,8 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.daikit.graphql.execution.GQLExecutor;
-
 /**
  * GRaphQL simple controller
  *
@@ -19,7 +17,7 @@ import com.daikit.graphql.execution.GQLExecutor;
  * @version $Revision$ Last modifier: $Author$ Last commit: $Date$
  */
 @Controller
-@ConditionalOnClass(GQLExecutor.class)
+@ConditionalOnClass(IGQLControllerRequestHandler.class)
 public class GQLController {
 
 	@Autowired

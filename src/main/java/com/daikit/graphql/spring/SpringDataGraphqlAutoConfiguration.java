@@ -44,7 +44,8 @@ public class SpringDataGraphqlAutoConfiguration {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-				registry.addResourceHandler("/graphiql/**").addResourceLocations("/graphiql/");
+				registry.addResourceHandler("/graphiql/**").addResourceLocations("classpath:/static/graphiql/");
+				registry.addResourceHandler("/images/**").addResourceLocations("classpath:/static/images/");
 			}
 
 			@Override

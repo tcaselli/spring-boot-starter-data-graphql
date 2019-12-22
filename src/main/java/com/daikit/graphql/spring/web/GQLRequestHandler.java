@@ -33,6 +33,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+import graphql.GraphQLError;
+
 /**
  * Request handler
  *
@@ -52,7 +54,6 @@ public class GQLRequestHandler {
 
 	private final Supplier<ObjectMapper> objectMapper;
 	private final Supplier<GQLExecutor> executor;
-	private final ObjectMapper loggerMapper = new ObjectMapper();
 
 	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	// CONSTRUCTORS
@@ -178,7 +179,9 @@ public class GQLRequestHandler {
 	private void debugError(final GQLExecutionResult result) throws JsonProcessingException {
 		logger.error(Message.format("An error happened while running GQL Query : type [{}] message [{}] errors [{}]",
 				result.getErrorDetails().getType(), result.getErrorDetails().getMessage(),
-				toJSONForLog(result.getErrors())));
+				result.getErrors() == null
+						? ""
+						: result.getErrors().stream().map(GraphQLError::getMessage).collect(Collectors.toList())));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -278,18 +281,6 @@ public class GQLRequestHandler {
 			ret.put(key, value);
 		}
 		return ret;
-	}
-
-	/**
-	 * Write given object as JSON using loggerMapper
-	 *
-	 * @param value
-	 *            the value to be converted to JSON
-	 * @return the JSON string
-	 * @throws JsonProcessingException
-	 */
-	private String toJSONForLog(final Object value) throws JsonProcessingException {
-		return loggerMapper.writeValueAsString(value);
 	}
 
 }

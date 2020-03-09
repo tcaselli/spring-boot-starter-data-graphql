@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.daikit.graphql.builder.GQLExecutionContext;
 import com.daikit.graphql.data.output.GQLExecutionResult;
 import com.daikit.graphql.exception.GQLException;
 import com.daikit.graphql.execution.GQLExecutor;
@@ -41,7 +42,7 @@ import graphql.GraphQLError;
  * @author tcaselli
  * @version $Revision$ Last modifier: $Author$ Last commit: $Date$
  */
-public class GQLRequestHandler {
+public abstract class GQLRequestHandler {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	// The new line character for current file system
@@ -88,29 +89,48 @@ public class GQLRequestHandler {
 	}
 
 	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+	// PROTECTED ABSTRACT METHODS
+	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+	/**
+	 * Get execution context from given request
+	 *
+	 * @param request
+	 *            the {@link HttpServletRequest}
+	 * @return the {@link GQLExecutionContext}
+	 */
+	protected abstract GQLExecutionContext getExecutionContext(final HttpServletRequest request);
+
+	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	// METHODS
 	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
 	/**
 	 * Handle introspection request
 	 *
+	 * @param request
+	 *            the {@link HttpServletRequest}
 	 * @param response
 	 *            the {@link HttpServletResponse}
 	 */
-	public void handleIntrospectionRequest(final HttpServletResponse response) {
+	public void handleIntrospectionRequest(final HttpServletRequest request, final HttpServletResponse response) {
 		GQLIOUtils.writeInResponse(response, objectMapper.get(),
-				GQLIntrospection.getAllTypes(query -> executor.get().execute(query)));
+				GQLIntrospection.getAllTypes(query -> executor.get().execute(getExecutionContext(request), query)));
 	}
 
 	/**
 	 * Handle introspection fragments request for Apollo graphQL engine
 	 * initialization
 	 *
+	 * @param request
+	 *            the {@link HttpServletRequest}
 	 * @param response
 	 *            the {@link HttpServletResponse}
 	 */
-	public void handleIntrospectionFragmentsRequest(final HttpServletResponse response) {
-		final GQLExecutionResult result = GQLIntrospection.getFragments(query -> executor.get().execute(query));
+	public void handleIntrospectionFragmentsRequest(final HttpServletRequest request,
+			final HttpServletResponse response) {
+		final GQLExecutionResult result = GQLIntrospection
+				.getFragments(query -> executor.get().execute(getExecutionContext(request), query));
 		final Map<String, Object> resultSchema = map(map(result.getData()).get("__schema"));
 		resultSchema.put("types", list(resultSchema.get("types")).stream()
 				.filter(map -> map.get("possibleTypes") != null).collect(Collectors.toList()));
@@ -150,8 +170,8 @@ public class GQLRequestHandler {
 			throw new GQLException(
 					Message.format("An error happened while reading request body to JSON. [{}]", e.getMessage()), e);
 		}
-		result = executor.get().execute(sanitize(inputData.getQuery().asText()), inputData.getOperationName(), null,
-				variables);
+		result = executor.get().execute(getExecutionContext(request), sanitize(inputData.getQuery().asText()),
+				inputData.getOperationName(), null, variables);
 		if (result.getErrorDetails() != null) {
 			try {
 				debugError(result);

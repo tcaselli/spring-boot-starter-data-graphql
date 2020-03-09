@@ -12,20 +12,24 @@ public interface IGQLControllerRequestHandler {
 
 	/**
 	 * Get GraphQL schema instrospection
-	 *
+	 * 
+	 * @param request
+	 *            the {@link HttpServletRequest}
 	 * @param response
 	 *            the {@link HttpServletResponse}
 	 */
-	void handleIntropsectionRequest(HttpServletResponse response);
+	void handleIntropsectionRequest(HttpServletRequest request, HttpServletResponse response);
 
 	/**
 	 * Get schema instrospection fragments for client GraphQL engine
 	 * initialization (like Apollo for example)
-	 *
+	 * 
+	 * @param request
+	 *            the {@link HttpServletRequest}
 	 * @param response
 	 *            the {@link HttpServletResponse}
 	 */
-	void handleIntrospectionFragmentsRequest(HttpServletResponse response);
+	void handleIntrospectionFragmentsRequest(HttpServletRequest request, HttpServletResponse response);
 
 	/**
 	 * Run a query/mutation against GraphQL engine

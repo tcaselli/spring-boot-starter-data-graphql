@@ -1,5 +1,7 @@
 package com.daikit.graphql.spring;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.daikit.graphql.builder.GQLExecutionContext;
 import com.daikit.graphql.config.GQLSchemaConfig;
 import com.daikit.graphql.execution.GQLErrorProcessor;
 import com.daikit.graphql.execution.GQLExecutor;
@@ -115,7 +118,12 @@ public class SpringDataGraphqlAutoConfiguration {
 	@ConditionalOnMissingBean
 	public GQLRequestHandler createGQLRequestHandler(@Autowired final ObjectMapper gqlObjectMapper,
 			@Autowired final GQLExecutor executor) {
-		return new GQLRequestHandler(gqlObjectMapper, executor);
+		return new GQLRequestHandler(gqlObjectMapper, executor) {
+			@Override
+			protected GQLExecutionContext getExecutionContext(HttpServletRequest request) {
+				return GQLExecutionContext.DEFAULT;
+			}
+		};
 	}
 
 	/**

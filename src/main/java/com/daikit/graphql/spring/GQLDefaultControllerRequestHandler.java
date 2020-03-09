@@ -33,18 +33,19 @@ public class GQLDefaultControllerRequestHandler implements IGQLControllerRequest
 	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
 	@Override
-	public void handleIntropsectionRequest(final HttpServletResponse response) {
+	public void handleIntropsectionRequest(final HttpServletRequest request, final HttpServletResponse response) {
 		try {
-			gqlRequestHandler.handleIntrospectionRequest(response);
+			gqlRequestHandler.handleIntrospectionRequest(request, response);
 		} catch (final Exception e) {
 			handleError(response, e);
 		}
 	}
 
 	@Override
-	public void handleIntrospectionFragmentsRequest(final HttpServletResponse response) {
+	public void handleIntrospectionFragmentsRequest(final HttpServletRequest request,
+			final HttpServletResponse response) {
 		try {
-			gqlRequestHandler.handleIntrospectionFragmentsRequest(response);
+			gqlRequestHandler.handleIntrospectionFragmentsRequest(request, response);
 		} catch (final Exception e) {
 			handleError(response, e);
 		}

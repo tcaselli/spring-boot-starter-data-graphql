@@ -28,31 +28,35 @@ public class GQLController {
 	// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
 	/**
-	 * Get GraphQL schema instrospection
+	 * Get GraphQL schema introspection
 	 *
+	 * @param request
+	 *            the {@link HttpServletRequest}
 	 * @param response
 	 *            the {@link HttpServletResponse}
 	 */
 	@RequestMapping(value = "/graphql/introspection", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void introspection(final HttpServletResponse response) {
+	public void introspection(HttpServletRequest request, final HttpServletResponse response) {
 		try {
-			requestHandler.handleIntropsectionRequest(response);
+			requestHandler.handleIntropsectionRequest(request, response);
 		} catch (final Exception e) {
 			requestHandler.handleError(response, e);
 		}
 	}
 
 	/**
-	 * Get schema instrospection fragments for client GraphQL engine
+	 * Get schema introspection fragments for client GraphQL engine
 	 * initialization (like Apollo for example)
 	 *
+	 * @param request
+	 *            the {@link HttpServletRequest}
 	 * @param response
 	 *            the {@link HttpServletResponse}
 	 */
 	@RequestMapping(value = "/graphql/introspectionfragments", produces = MediaType.APPLICATION_JSON_VALUE)
-	public void introspectionFragments(final HttpServletResponse response) {
+	public void introspectionFragments(HttpServletRequest request, final HttpServletResponse response) {
 		try {
-			requestHandler.handleIntrospectionFragmentsRequest(response);
+			requestHandler.handleIntrospectionFragmentsRequest(request, response);
 		} catch (final Exception e) {
 			requestHandler.handleError(response, e);
 		}
